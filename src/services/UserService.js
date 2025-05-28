@@ -1,6 +1,6 @@
 const User = require('../models/UserModel')
 const bcrypt = require("bcrypt")
-const { generalAccessToken } = require('./JwtService')
+const { generalAccessToken, generalRefreshToken } = require('./JwtService')
 
 const createUser = (newUser) => {
     return new Promise( async (resolve, reject) => {
@@ -61,7 +61,7 @@ const loginUser = (userLogin) => {
                 isAdmin: checkUser.isAdmin
             })
 
-            const refresh_token = await generalAccessToken({
+            const refresh_token = await generalRefreshToken({
                 id: checkUser._id,
                 isAdmin: checkUser.isAdmin
             })
@@ -108,8 +108,79 @@ const updateUser = (id, data) => {
     })
 }
 
+//Delete
+const deleteUser = (id) => {
+    return new Promise( async (resolve, reject) => {
+        try{
+            const checkUser = await User.findOne({
+                _id: id
+            })
+            console.log('checkUser', checkUser)
+            if(!checkUser){
+                resolve({
+                    status: 'OK',
+                    message: 'Người dùng không tồn tại'
+                })
+            }
+            await User.findByIdAndDelete(id)
+            return resolve({
+                status: 'OK',
+                message: 'Xóa người dùng thành công'
+            })
+    
+        } catch(e){
+            reject(e)
+        }
+    })
+}
+
+//GetAll
+const getAllUser = () => {
+    return new Promise( async (resolve, reject) => {
+        try{
+            const allUser = await User.find()
+            return resolve({
+                status: 'OK',
+                message: 'Lay thong tin thanh cong',
+                data: allUser
+            })
+    
+        } catch(e){
+            reject(e)
+        }
+    })
+}
+
+//Get Details User
+const getDetailsUser = (id) => {
+    return new Promise( async (resolve, reject) => {
+        try{
+            const user = await User.findOne({
+                _id: id
+            })
+            if(!user){
+                resolve({
+                    status: 'OK',
+                    message: 'Người dùng không tồn tại'
+                })
+            }
+            return resolve({
+                status: 'OK',
+                message: 'SUCCESS',
+                data: user
+            })
+    
+        } catch(e){
+            reject(e)
+        }
+    })
+}
+
 module.exports = {
     createUser,
     loginUser,
-    updateUser
+    updateUser,
+    deleteUser,
+    getAllUser,
+    getDetailsUser
 }
