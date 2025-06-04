@@ -75,15 +75,23 @@ const deleteProduct = async (req, res) => {
 //Get All
 const getAllProduct = async (req, res) => {
     try {
-        const response = await ProductService.getAllProduct()
-        return res.status(200).json(response)
+        const { limit, page, sort, filter } = req.query;
 
+        const limitNumber = limit ? Number(limit) : null;
+        const pageNumber = page ? Number(page) : 0;
+        const sortArray = Array.isArray(sort) ? sort : (sort ? sort.split(',') : null);
+
+        const response = await ProductService.getAllProduct(limitNumber, pageNumber, sortArray, filter);
+
+        return res.status(200).json(response);
     } catch (e) {
-        return res.status(404).json({
-            message: e
-        })
+        return res.status(500).json({
+            status: 'ERR',
+            message: e.message || 'Internal server error',
+        });
     }
-}
+};
+
 
 module.exports = {
     createProduct,
