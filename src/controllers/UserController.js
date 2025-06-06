@@ -35,10 +35,10 @@ const createUser = async (req, res) => {
 //Đăng nhập
 const loginUser = async (req, res) => {
     try{
-        const{ name, email, password, confirmPassword, phone } = req.body
+        const{ email, password} = req.body
         const reg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isCheckEmail = reg.test(email)
-        if(!name || !email || !password || !confirmPassword || !phone){
+        if(!email || !password){
             return res.status(200).json({
                 status: 'ERR',
                 message: 'Vui lòng nhập đầu đủ thông tin'
@@ -48,12 +48,8 @@ const loginUser = async (req, res) => {
                 status: 'ERR',
                 message: 'Email không hợp lệ'
             })
-        } else if( password !== confirmPassword){
-             return res.status(200).json({
-                status: 'ERR',
-                message: 'Xác nhận mật khẩu không khớp'
-            })
         }
+        
         const response = await UserService.loginUser(req.body)
         return res.status(200).json(response)
 
