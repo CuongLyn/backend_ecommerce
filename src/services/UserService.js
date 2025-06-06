@@ -4,23 +4,29 @@ const { generalAccessToken, generalRefreshToken } = require('./JwtService')
 
 const createUser = (newUser) => {
     return new Promise( async (resolve, reject) => {
-        const{ name, email, password, phone } = newUser
+        // const{ name, email, password, confirmPassword, phone } = newUser
+        const{ email, password, confirmPassword} = newUser
+
         try{
             const checkUser = await User.findOne({
                 email: email
             })
             if(checkUser !== null){
                 resolve({
-                    status: 'OK',
+                    status: 'ERR',
                     message: 'Email đã tồn tại'
+                })
+            } else if(password !== confirmPassword){
+                resolve({
+                    status: 'ERR',
+                    message: 'Xác nhận mật khẩu không khớp'
                 })
             }
             const hashedPassword = await bcrypt.hash(password, 10);
             const createdUser = await User.create({
-                name, 
-                email, 
-                password: hashedPassword, 
-                phone
+                email,
+                password: hashedPassword,
+                
             })
             if(createdUser){
                 resolve({
@@ -37,14 +43,14 @@ const createUser = (newUser) => {
 
 const loginUser = (userLogin) => {
     return new Promise( async (resolve, reject) => {
-        const{ name, email, password, phone } = userLogin
+        const{  email, password } = userLogin
         try{
             const checkUser = await User.findOne({
                 email: email
             })
             if(checkUser === null){
                 resolve({
-                    status: 'OK',
+                    status: 'ERR',
                     message: 'Người dùng không tồn tại'
                 })
             }
@@ -52,7 +58,7 @@ const loginUser = (userLogin) => {
             console.log('comparePassword', comparePassword)
             if(!comparePassword){
                 resolve({
-                    status: 'OK',
+                    status: 'ERR',
                     message: 'Mật khẩu không đúng'
                 })
             }
